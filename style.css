@@ -9,7 +9,6 @@ body {
     height: 100vh;
     margin: 0;
 }
-
 .quiz-container {
     background: #1e1e1e;
     padding: 40px;
@@ -18,21 +17,17 @@ body {
     width: 90%;
     max-width: 500px;
 }
-
 h1 {
     font-size: 28px;
     margin-bottom: 20px;
     font-weight: bold;
-    color: #9b4dca;
 }
-
 .btn-container {
     display: flex;
     flex-direction: column;
     gap: 12px;
     margin-top: 20px;
 }
-
 button {
     background-color: #6a0dad;
     color: white;
@@ -44,12 +39,10 @@ button {
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.2s;
 }
-
 button:hover {
     background-color: #5a0bbf;
     transform: scale(1.05);
 }
-
 .playing-message {
     background-color: #6a0dad;
     color: white;
@@ -59,22 +52,4 @@ button:hover {
     font-weight: bold;
     font-size: 14px;
     box-shadow: 0px 0px 10px rgba(106, 13, 173, 0.5);
-}
-
-#question {
-    font-size: 18px;
-    margin: 20px 0;
-    color: #e0e0e0;
-}
-
-form {
-    margin-top: 20px;
-}
-
-.correct {
-    background-color: #4CAF50 !important;
-}
-
-.incorrect {
-    background-color: #f44336 !important;
 }
