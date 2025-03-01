@@ -22,6 +22,7 @@ private:
     Song *head;
     int highScores[10];
     int highScoresIndex = 0;
+    Song *choices[4];
     
 public:
     quiz();
