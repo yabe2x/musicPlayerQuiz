@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Quiz App</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+        button:hover {
+            background-color: #5a0bbf;
+            transform: scale(1.05);
+        }
+        .playing-message {
+            background-color: #6a0dad;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0px 0px 10px rgba(106, 13, 173, 0.5);
+        }
+    </style>
+</head>
+<body class="{{BODY_CLASS}}">
+    <div class="quiz-container">
+        <h1>Music Quiz</h1>
+        <div class="playing-message">Now Playing: A Random Song...</div>
+        <form action="/submit-answer" method="post">
+            <p id="question">Who is the artist of this song?</p>
+            <div class="btn-container">
+                {{ANSWER_BUTTONS}}
+            </div>
+            <input type="hidden" name="correct" value="{{CORRECT_ANSWER}}">
+            <button type="submit">Submit Answer</button>
+        </form>
+    </div>
+</body>
+</html>
