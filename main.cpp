@@ -1,9 +1,9 @@
-#include <iostream>
+#include "quiz.cpp"
 
-using namespace std;
+
 
 int main(){
-
+    srand(time(0));
     cout << "Hello chat"<<endl;
     return 0;
 }
