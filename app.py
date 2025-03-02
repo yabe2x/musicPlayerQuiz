@@ -1,58 +1,52 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
 import logging
 import os
-import json
 
 app = Flask(__name__)
 CORS(app)
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Local song database
+# Local song database with direct MP3 URLs
 SONGS_DATABASE = [
     {
-        "name": "Shape of You",
-        "artist": "Ed Sheeran",
-        "preview_url": "https://p.scdn.co/mp3-preview/84462d8e1e4d0f9e5ccd06f0da390f65843774a2"
+        "name": "Bohemian Rhapsody",
+        "artist": "Queen",
+        "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/a1/cd/3f/a1cd3f7c-1e7e-9969-e89c-8d2dd9c8b692/mzaf_17827647781880122741.plus.aac.p.m4a"
     },
     {
-        "name": "Blinding Lights",
-        "artist": "The Weeknd",
-        "preview_url": "https://p.scdn.co/mp3-preview/3ff1f9a43139f8c7606bfad8e8009e3dd8d02d8e"
+        "name": "Billie Jean",
+        "artist": "Michael Jackson",
+        "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/19/66/ea/1966ea5f-c0c4-9d0d-7ba3-114ee7ed8ea8/mzaf_14078433767887591126.plus.aac.p.m4a"
     },
     {
-        "name": "Bad Guy",
-        "artist": "Billie Eilish",
-        "preview_url": "https://p.scdn.co/mp3-preview/2f37da3eb08858d6d47d5a391d8c66e8e1083e57"
+        "name": "Sweet Child O' Mine",
+        "artist": "Guns N' Roses",
+        "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/f5/be/3f/f5be3f9f-9f9b-d1f0-12e9-8f7963a85c85/mzaf_17274733736747140400.plus.aac.p.m4a"
     },
     {
-        "name": "Uptown Funk",
-        "artist": "Mark Ronson ft. Bruno Mars",
-        "preview_url": "https://p.scdn.co/mp3-preview/066d0f12b48af5c3c49b826c6f3f4744f7cc9e5c"
+        "name": "Like a Rolling Stone",
+        "artist": "Bob Dylan",
+        "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/e1/50/0c/e1500c51-a1f1-c393-7ed0-981c7c4fea62/mzaf_14298489205862427612.plus.aac.p.m4a"
     },
     {
-        "name": "Someone Like You",
-        "artist": "Adele",
-        "preview_url": "https://p.scdn.co/mp3-preview/49df5f5e0ba4c4f147bfb5152dc6a1056f7b3fa8"
-    },
-    {
-        "name": "Shake It Off",
-        "artist": "Taylor Swift",
-        "preview_url": "https://p.scdn.co/mp3-preview/9ff05067562d0771eacc64fc88aa77a5e2c5f745"
+        "name": "Imagine",
+        "artist": "John Lennon",
+        "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/1e/df/99/1edf99f0-7a8f-af6e-f889-25fd84d72a1d/mzaf_17172980231767075265.plus.aac.p.m4a"
     }
 ]
 
-# List of additional artists for choices
+# Additional artists for multiple choice options
 ADDITIONAL_ARTISTS = [
-    "Drake", "Lady Gaga", "Justin Bieber", "Ariana Grande", "Post Malone",
-    "Dua Lipa", "Kendrick Lamar", "Rihanna", "Eminem", "Katy Perry"
+    "Elvis Presley", "David Bowie", "Prince", "The Beatles", "Led Zeppelin",
+    "Pink Floyd", "The Rolling Stones", "U2", "Nirvana", "Bruce Springsteen"
 ]
 
-# Global variables
+# Game state
 current_song = None
 current_choices = []
 score = 0
@@ -60,48 +54,34 @@ total_questions = 0
 
 def get_random_song():
     """Get a random song from our local database"""
-    try:
-        return random.choice(SONGS_DATABASE)
-    except Exception as e:
-        logger.error(f"Error getting random song: {str(e)}")
-        return None
+    return random.choice(SONGS_DATABASE)
 
 def get_artist_choices(correct_artist):
     """Get random artist choices including the correct one"""
-    try:
-        # Start with the correct artist
-        choices = {correct_artist}
-        
-        # Add random artists from our database and additional artists list
-        all_artists = ([song['artist'] for song in SONGS_DATABASE] + 
-                      ADDITIONAL_ARTISTS)
-        
-        while len(choices) < 4:
-            artist = random.choice(all_artists)
-            if artist != correct_artist:
-                choices.add(artist)
-        
-        # Convert to list and shuffle
-        choices = list(choices)
-        random.shuffle(choices)
-        return choices
-    except Exception as e:
-        logger.error(f"Error getting artist choices: {str(e)}")
-        return [correct_artist]
+    choices = {correct_artist}
+    available_artists = ADDITIONAL_ARTISTS + [song['artist'] for song in SONGS_DATABASE]
+    
+    while len(choices) < 4:
+        artist = random.choice(available_artists)
+        if artist != correct_artist:
+            choices.add(artist)
+    
+    return list(choices)
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    return jsonify({"status": "healthy"})
 
 @app.route('/')
-def index():
-    global current_song, current_choices, score, total_questions
+def get_question():
+    """Get a new question"""
+    global current_song, current_choices
     
     try:
         current_song = get_random_song()
-        if not current_song:
-            error_msg = "Unable to fetch a song. Please try refreshing the page."
-            logger.error(error_msg)
-            return jsonify({'error': error_msg}), 500
-        
-        # Get multiple choice options
         current_choices = get_artist_choices(current_song['artist'])
+        random.shuffle(current_choices)
         
         return jsonify({
             'song': {
@@ -111,38 +91,41 @@ def index():
             'choices': current_choices
         })
     except Exception as e:
-        error_msg = f"An error occurred: {str(e)}"
-        logger.error(error_msg)
-        return jsonify({'error': error_msg}), 500
+        logger.error(f"Error generating question: {str(e)}")
+        return jsonify({'error': 'Failed to generate question'}), 500
 
 @app.route('/submit-answer', methods=['POST'])
 def submit_answer():
+    """Submit an answer and get the next question"""
     global current_song, current_choices, score, total_questions
     
     try:
         if not current_song:
-            return jsonify({
-                'success': False,
-                'error': 'No current song'
-            })
+            return jsonify({'error': 'No active question'}), 400
         
         data = request.get_json()
-        selected_artist = current_choices[int(data['answer'])]
-        correct_artist = current_song['artist']
+        if 'answer' not in data:
+            return jsonify({'error': 'No answer provided'}), 400
+        
+        selected_index = int(data['answer'])
+        if selected_index < 0 or selected_index >= len(current_choices):
+            return jsonify({'error': 'Invalid answer index'}), 400
+        
+        selected_artist = current_choices[selected_index]
+        is_correct = selected_artist == current_song['artist']
         
         total_questions += 1
-        is_correct = selected_artist == correct_artist
         if is_correct:
             score += 1
         
-        # Get next song
+        # Get next question
         next_song = get_random_song()
         next_choices = get_artist_choices(next_song['artist'])
+        random.shuffle(next_choices)
         
         response = {
-            'success': True,
             'correct': is_correct,
-            'correctAnswer': correct_artist,
+            'correctAnswer': current_song['artist'],
             'score': score,
             'total': total_questions,
             'nextSong': {
@@ -152,18 +135,16 @@ def submit_answer():
             }
         }
         
-        # Update current song and choices for next question
+        # Update current question
         current_song = next_song
         current_choices = next_choices
         
-        logger.info(f"Successfully processed answer. Correct: {is_correct}")
         return jsonify(response)
     except Exception as e:
-        logger.error(f"Error in submit_answer route: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        })
+        logger.error(f"Error processing answer: {str(e)}")
+        return jsonify({'error': 'Failed to process answer'}), 500
 
 if __name__ == '__main__':
+    # Clear port 5001 if it's in use
+    os.system("lsof -ti:5001 | xargs kill -9 2>/dev/null")
     app.run(debug=True, host='0.0.0.0', port=5001) 
