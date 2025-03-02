@@ -1,0 +1,4 @@
+/Users/nhezi/Desktop/Coding Practice/musicPlayerQuiz/CMakeFiles/quiz.dir
+/Users/nhezi/Desktop/Coding Practice/musicPlayerQuiz/CMakeFiles/server.dir
+/Users/nhezi/Desktop/Coding Practice/musicPlayerQuiz/CMakeFiles/edit_cache.dir
+/Users/nhezi/Desktop/Coding Practice/musicPlayerQuiz/CMakeFiles/rebuild_cache.dir
